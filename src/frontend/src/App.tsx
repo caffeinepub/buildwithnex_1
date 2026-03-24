@@ -6,13 +6,14 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  ExternalLink,
   Globe,
-  Linkedin,
+  Instagram,
+  Mail,
   Menu,
   Palette,
   ShoppingBag,
   Sparkles,
-  Twitter,
   X,
   Zap,
 } from "lucide-react";
@@ -789,9 +790,9 @@ function Hero() {
             transition={{ duration: 0.5, delay: 0.9 }}
             className="mt-14 flex gap-10"
           >
-            <AnimatedStat value="50+" label="Projects Delivered" />
-            <AnimatedStat value="98%" label="Client Satisfaction" />
-            <AnimatedStat value="5★" label="Average Rating" />
+            <AnimatedStat value="New Studio" label="Launching 2026" />
+            <AnimatedStat value="100%" label="Commitment to Quality" />
+            <AnimatedStat value="5★" label="Our Standard" />
           </motion.div>
         </div>
 
@@ -1084,6 +1085,7 @@ const projects = [
       "A modern restaurant website with online menu, reservations, and a stunning visual experience.",
     image: "/assets/generated/portfolio-restaurant.dim_600x400.png",
     color: "oklch(0.62 0.25 290)",
+    liveUrl: "https://standard-bronze-qse-draft.caffeine.xyz",
     borderActive: "1px solid oklch(0.62 0.25 290)",
     shadowActive: "0 0 30px oklch(0.62 0.25 290 / 0.35)",
     overlayGradient:
@@ -1094,7 +1096,8 @@ const projects = [
     category: "Clothing Brand · eCommerce",
     description:
       "A premium clothing brand site with editorial lookbooks, size guides, and a buttery-smooth shop experience.",
-    image: "/assets/generated/portfolio-clothing.dim_600x400.png",
+    image: "/assets/generated/vetir-clothing-brand.dim_800x600.jpg",
+    liveUrl: "https://wispy-brown-2bn-draft.caffeine.xyz",
     color: "oklch(0.72 0.2 200)",
     borderActive: "1px solid oklch(0.72 0.2 200)",
     shadowActive: "0 0 30px oklch(0.72 0.2 200 / 0.35)",
@@ -1110,6 +1113,7 @@ const projects = [
     color: "oklch(0.65 0.22 250)",
     borderActive: "1px solid oklch(0.65 0.22 250)",
     shadowActive: "0 0 30px oklch(0.65 0.22 250 / 0.35)",
+    liveUrl: "https://iron-pulse-fitness-dcn.caffeine.xyz",
     overlayGradient:
       "linear-gradient(to top, oklch(0.65 0.22 250 / 0.4) 0%, transparent 60%)",
   },
@@ -1181,7 +1185,11 @@ function Portfolio() {
                 boxShadow: active === i ? project.shadowActive : "none",
                 transition: "all 0.35s ease",
               }}
-              onClick={() => setActive(i)}
+              onClick={() => {
+                setActive(i);
+                if (project.liveUrl)
+                  window.open(project.liveUrl, "_blank", "noopener,noreferrer");
+              }}
             >
               <img
                 src={project.image}
@@ -1214,6 +1222,19 @@ function Portfolio() {
                 >
                   {project.description}
                 </p>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold tracking-wider transition-opacity duration-200 hover:opacity-80"
+                    style={{ color: project.color }}
+                  >
+                    <ExternalLink size={12} />
+                    VIEW LIVE
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}
@@ -1228,54 +1249,37 @@ function Portfolio() {
 // ─────────────────────────────────────────────────────────────────────────────
 const plans = [
   {
-    name: "ESSENTIAL",
-    price: "$4,900",
+    name: "STARTER",
+    price: "₹10,000",
     label: "Starting at",
     features: [
       "5-page custom website",
-      "Mobile-responsive design",
-      "Basic SEO setup",
+      "Mobile-friendly design",
+      "Google Maps integration",
+      "WhatsApp contact button",
       "2 revision rounds",
       "30-day support",
     ],
     featured: false,
   },
   {
-    name: "PROFESSIONAL",
-    price: "$9,500",
+    name: "GROWTH",
+    price: "₹15,000",
     label: "Starting at",
     features: [
       "12-page custom website",
       "Advanced UI/UX design",
-      "Full SEO optimization",
-      "eCommerce integration",
+      "SEO for local search",
+      "Online catalogue / menu",
       "Unlimited revisions",
       "90-day priority support",
     ],
     featured: true,
   },
-  {
-    name: "ENTERPRISE",
-    price: "Custom",
-    label: "Tailored pricing",
-    features: [
-      "Unlimited pages & features",
-      "Dedicated design team",
-      "Custom integrations & API",
-      "Performance consulting",
-      "Annual retainer available",
-      "24/7 dedicated support",
-    ],
-    featured: false,
-  },
 ];
 
-const OCID_PRICING = ["pricing.item.1", "pricing.item.2", "pricing.item.3"];
-const OCID_PRICING_BTN = [
-  "pricing.primary_button",
-  "pricing.primary_button",
-  "pricing.primary_button",
-];
+const OCID_PRICING = ["pricing.item.1", "pricing.item.2"];
+const OCID_PRICING_BTN = ["pricing.primary_button", "pricing.primary_button"];
 
 function ContactForm() {
   const [form, setForm] = useState({
@@ -1284,19 +1288,17 @@ function ContactForm() {
     projectDetails: "",
     message: "",
   });
-  const { mutate, isPending, isSuccess } = useSubmitInquiry();
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate(form, {
-      onSuccess: () => {
-        toast.success("Message sent! We'll be in touch within 24 hours.");
-        setForm({ name: "", email: "", projectDetails: "", message: "" });
-      },
-      onError: () => {
-        toast.error("Something went wrong. Please try again.");
-      },
-    });
+    const subject = encodeURIComponent(`Project Proposal from ${form.name}`);
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nProject Details: ${form.projectDetails}\n\n${form.message}`,
+    );
+    window.location.href = `mailto:aadvaybuildwithnex@gmail.com?subject=${subject}&body=${body}`;
+    setForm({ name: "", email: "", projectDetails: "", message: "" });
+    setSubmitted(true);
   };
 
   return (
@@ -1318,7 +1320,7 @@ function ContactForm() {
         </h3>
 
         <AnimatePresence mode="wait">
-          {isSuccess ? (
+          {submitted ? (
             <motion.div
               key="success"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -1393,7 +1395,7 @@ function ContactForm() {
                   onChange={(e) =>
                     setForm((p) => ({ ...p, email: e.target.value }))
                   }
-                  placeholder="alex@company.com"
+                  placeholder="aadvaybuildwithnex@gmail.com"
                   required
                   style={{
                     background: "oklch(0.155 0.018 240)",
@@ -1454,11 +1456,10 @@ function ContactForm() {
               </div>
               <GradientButton
                 type="submit"
-                disabled={isPending}
                 className="w-full mt-2 py-4"
                 data-ocid="contact.submit_button"
               >
-                {isPending ? "SENDING..." : "SEND YOUR PROPOSAL"}
+                SEND YOUR PROPOSAL
               </GradientButton>
             </motion.form>
           )}
@@ -1655,11 +1656,18 @@ function Footer() {
             </div>
             <div className="flex gap-3">
               {[
-                { icon: Twitter, label: "Twitter" },
-                { icon: Linkedin, label: "LinkedIn" },
-                { icon: Globe, label: "Website" },
-              ].map(({ icon: Icon, label }) => (
-                <SocialIcon key={label} icon={Icon} label={label} />
+                {
+                  icon: Mail,
+                  label: "Email",
+                  href: "mailto:aadvaybuildwithnex@gmail.com",
+                },
+                {
+                  icon: Instagram,
+                  label: "Instagram",
+                  href: "https://instagram.com/buildwithnex",
+                },
+              ].map(({ icon: Icon, label, href }) => (
+                <SocialIcon key={label} icon={Icon} label={label} href={href} />
               ))}
             </div>
           </div>
@@ -1693,14 +1701,16 @@ function Footer() {
 function SocialIcon({
   icon: Icon,
   label,
+  href,
 }: {
   icon: React.ComponentType<{ size?: number }>;
   label: string;
+  href: string;
 }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
-      href="https://buildwithnex.com"
+      href={href}
       aria-label={label}
       data-ocid="footer.link"
       className="w-10 h-10 rounded-xl flex items-center justify-center"
